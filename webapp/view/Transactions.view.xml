@@ -1,0 +1,174 @@
+<mvc:View controllerName="cashflowapp.controller.Transactions"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:semantic="sap.f.semantic">
+
+    <semantic:SemanticPage
+        id="page"
+        headerPinnable="false"
+        toggleHeaderOnTitleClick="false">
+
+        <semantic:titleHeading>
+            <Title text="{i18n>transactionListTitle}" />
+        </semantic:titleHeading>
+
+        <semantic:headerContent >
+
+            <Panel expandable="false">
+                <HBox class="painelInterno" justifyContent="Center" alignItems="Center">
+                    <VBox class="caixaDebito sapUiSmallMarginEnd">
+                        <Text text="{i18n>tipoDebito}" class="sapUiSmallMarginBottom sapMTitle"/>
+                        <ObjectNumber
+                            number="{worklistView>/totalDebito}"
+                            state="Error"
+                            emphasized="true"
+                            class="sapUiSmallMarginBottom sapMTitle"/>
+                    </VBox>
+                    <VBox class="caixaCredito sapUiSmallMarginEnd">
+                        <Text text="{i18n>tipoCredito}" class="sapUiSmallMarginBottom sapMTitle"/>
+                        <ObjectNumber
+                            number="{worklistView>/totalCredito}"
+                            state="Success"
+                            emphasized="true"
+                            class="sapUiSmallMarginBottom sapMTitle"/>
+                    </VBox>
+                    <VBox class="caixaSaldo">
+                        <Text text="{i18n>tipoSaldo}" class="sapUiSmallMarginBottom sapMTitle"/>
+                        <ObjectNumber
+                            number="{worklistView>/saldoTotal}"
+                            state="None"
+                            emphasized="true"
+                            class="sapUiSmallMarginBottom sapMTitle"/>
+                    </VBox>
+                </HBox>
+            </Panel>
+
+            <IconTabBar
+                id="iconTabBar"
+                select=".onQuickFilter"
+                expandable="false">
+                <content>
+                    <Table
+                        id="trasactionTable"
+                        busyIndicatorDelay="{worklistView>/tableBusyDelay}"
+                        growing="true"
+                        growingScrollToLoad="true"
+                        noDataText="{worklistView>/tableNoDataText}"
+                        updateFinished=".onUpdateFinished"
+                        width="auto"
+                        mode="MultiSelect"
+                        items="{path: 'transacoesModel>/'}">
+
+                        <headerToolbar>
+                            <Toolbar>
+                                <Title text="{worklistView>/worklistTableTitle}" />
+                                <ToolbarSpacer/>
+
+                                <DatePicker
+                                    id="filtroMesAno"
+                                    displayFormat="MM/yyyy"
+                                    valueFormat="yyyy-MM"
+                                    placeholder="{i18n>filterDate}"
+                                    change=".onFiltrarMesAno"
+                                    width="15rem"
+                                    class="sapUiTinyMarginEnd"/>
+
+                                <SearchField
+                                    id="searchField"
+                                    placeholder="{i18n>worklistSearchTooltip}"
+                                    search=".onSearch"
+                                    width="25rem"
+                                    class="sapUiTinyMarginEnd"/>
+
+                                <Button
+                                    text="{i18n>editButton}"
+                                    icon="sap-icon://edit"
+                                    type="Transparent"
+                                    press="onEditButtonPress"
+                                    class="sapUiTinyMarginEnd"/>
+
+                                <Button
+                                    text="{i18n>createButton}"
+                                    icon="sap-icon://create-form"
+                                    type="Emphasized"
+                                    press="onCreateButtonPress"
+                                    class="sapUiTinyMarginEnd"/>
+
+                                <Button
+                                    text="{i18n>excludeButton}"
+                                    icon="sap-icon://delete"
+                                    type="Reject"
+                                    iconColor="Critical"
+                                    press="onDeleteSelectedRows"/>
+                            </Toolbar>
+                        </headerToolbar>
+
+                        <columns>
+                            <Column>
+                                <Text text="{i18n>TableDateColumnTitle}" />
+                            </Column>
+                            <Column hAlign="Begin">
+                                <Text text="{i18n>TableUnitDescriptionColumnTitle}" />
+                            </Column>
+                            <Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+                                <Text text="{i18n>TablePriceColumnTitle}" />
+                            </Column>
+                            <Column hAlign="Center" minScreenWidth="Tablet" demandPopin="true">
+                                <Text text="{i18n>TableTransactionTypeColumnTitle}" />
+                            </Column>
+                        </columns>
+
+                        <items>
+                            <ColumnListItem
+                                highlight="{
+                                    parts: [	
+                                        {path: 'transacoesModel>valor'},
+                                        {path: 'transacoesModel>tipo'}
+                                    ],
+                                    formatter: '.formatter.quantityState'
+                                }">
+
+                                <cells>
+                                    <Text text="{
+                                        path: 'transacoesModel>data',
+                                        formatter: '.formatter.formatDate'
+                                    }" />
+
+                                    <Text text="{transacoesModel>descricao}" />
+
+                                    <ObjectStatus
+                                        text="{
+                                            parts: [
+                                                {path: 'transacoesModel>valor'},
+                                                {path: 'transacoesModel>tipo'}
+                                            ],
+                                            formatter: '.formatter.formatarValorComSinal'
+                                        }"
+                                        state="{
+                                            parts: [
+                                                { path: 'transacoesModel>valor' },
+                                                { path: 'transacoesModel>tipo' }
+                                            ],
+                                            formatter: '.formatter.quantityState'
+                                        }"
+                                        class="valorText"
+                                        textAlign="End"/>
+
+                                    <ObjectStatus
+                                        text="{transacoesModel>tipo}"
+                                        state="{
+                                            parts: [	
+                                                {path: 'transacoesModel>valor'},
+                                                {path: 'transacoesModel>tipo'}
+                                            ],
+                                            formatter: '.formatter.quantityState'
+                                        }"/>
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </content>
+            </IconTabBar>
+        </semantic:headerContent>
+    </semantic:SemanticPage>
+</mvc:View>

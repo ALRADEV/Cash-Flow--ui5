@@ -1,0 +1,33 @@
+
+.painelInterno {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.caixaDebito {
+    background-color: #f8d7da;
+    padding: 1rem;
+    border-radius: 10px;
+    width: 10rem;
+    text-align: center;
+}
+
+.caixaCredito {
+    background-color: #d4edda;
+    padding: 1rem;
+    border-radius: 10px;
+    width: 10rem;
+    text-align: center;
+}
+
+.caixaSaldo {
+    background-color: #d1ecf1;
+    padding: 1rem;
+    border-radius: 10px;
+    width: 10rem;
+    text-align: center;
+}
+

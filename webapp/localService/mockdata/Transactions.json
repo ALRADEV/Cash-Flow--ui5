@@ -1,0 +1,32 @@
+[
+    {
+      "id": 1,
+      "data": "2025-05-01",
+      "descricao": "Recebimento de cliente",
+      "valor": 1500,
+      "tipo": "Crédito"
+    },
+    {
+      "id": 2,
+      "data": "2025-05-02",
+      "descricao": "Pagamento de fornecedor",
+      "valor": 800,
+      "tipo": "Débito"
+    },
+    {
+      "id": 3,
+      "data": "2025-05-03",
+      "descricao": "Venda realizada",
+      "valor": 2000,
+      "tipo": "Crédito"
+    },
+    {
+      "id": 4,
+      "data": "2025-05-04",
+      "descricao": "Pagamento de aluguel",
+      "valor": 1200,
+      "tipo": "Débito"
+    }   
+    
+  ]
+  

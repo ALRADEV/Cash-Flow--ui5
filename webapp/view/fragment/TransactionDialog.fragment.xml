@@ -1,0 +1,53 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+    xmlns:f="sap.ui.layout.form">
+    
+    <Dialog id="transactionDialog" >
+        <f:SimpleForm id="formTransaction" editable="true" layout="ResponsiveGridLayout">
+            <f:toolbar>
+                <Toolbar>
+                    <Title text="{= ${transactionForm>/isEditing} ? 'Editar' : 'Adicionar' }" />
+                    <ToolbarSpacer />
+                    <Button icon="sap-icon://decline" press=".onCloseTransaction" />
+                </Toolbar>
+            </f:toolbar>
+
+            <f:content>
+
+                <Label text="{i18n>TableDateColumnTitle}" required="true"/>
+                <DatePicker
+                    id="inputData"
+                    displayFormat="dd/MM/yyyy"
+                    valueFormat="yyyy-MM-dd"
+                    value="{transactionForm>/data}" />
+
+                <Label text="{i18n>TableDescriptionlumnTitle}" required="true"/>
+                <Input
+                    id="inputDescricao"
+                    value="{transactionForm>/descricao}" />
+
+                <Label text="{i18n>TablePriceColumnTitle}" required="true"/>
+                <Input
+                    id="inputValor"
+                    type="Number"
+                    value="{transactionForm>/valor}" />
+
+                <Label text="{i18n>TableTransactionTypeColumnTitle}" required="true"/>
+                <Select id="inputTipo" selectedKey="{transactionForm>/tipo}">
+                    <items>
+                        <core:Item key="Crédito" text="{i18n>tipoCredito}" />
+                        <core:Item key="Débito" text="{i18n>tipoDebito}" />
+                    </items>
+                </Select>
+
+            </f:content>
+        </f:SimpleForm>
+
+        <buttons>
+            <Button text="{i18n>cancelar}" type="Reject"  press=".onCloseTransaction"/>
+            <Button text="{i18n>salvar}" type="Emphasized" icon="sap-icon://save" press=".onSaveTransaction"/>
+        </buttons>
+    </Dialog>
+</core:FragmentDefinition>
