@@ -14,6 +14,15 @@
       "id": "@sap/generator-fiori:basic",
       "version": "1.17.6",
       "toolsId": "0ca7063e-2b55-4844-bca1-33b3a0be3a38"
+    },
+    "dataSources": {
+      "mainService": {
+        "uri": "/odata/v4/transacao/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "4.0"
+        }
+      }
     }
   },
   "sap.ui": {
@@ -46,6 +55,15 @@
       "cozy": true
     },
     "models": {
+      "": {
+        "dataSource": "mainService",
+        "settings": {
+          "synchronizationMode": "None",
+          "operationMode": "Server",
+          "autoExpandSelect": true
+      },
+      "type": "sap.ui.model.odata.v4.ODataModel"
+     },
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
         "settings": {

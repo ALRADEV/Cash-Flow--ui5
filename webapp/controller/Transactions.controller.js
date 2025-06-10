@@ -14,12 +14,18 @@ sap.ui.define([
 
         onInit() {
 
-            const oModel = new JSONModel();
-            oModel.loadData("./localService/mockdata/Transactions.json", null, false);
+            // const oModel = new JSONModel();
+            // oModel.loadData("./localService/mockdata/Transactions.json", null, false);
 
-            this.getView().setModel(oModel, "transacoesModel");
+            // this.getView().setModel(oModel, "transacoesModel");
 
-            this.calcularTotais();
+            const oModel = new sap.ui.model.odata.v4.ODataModel({
+                serviceUrl: "/odata/v4/transacao/"
+              });
+            
+              this.getView().setModel(oModel, "transacoesModel");
+
+            // this.calcularTotais();
         },
 
         onSearch: function (oEvent) {
@@ -69,7 +75,7 @@ sap.ui.define([
         onEditButtonPress: function (oEvent) {
             const oTable = this.byId("trasactionTable");
             const oSelectedItem = oTable.getSelectedItem();
-            this._oId = oEvent.getSource().getId();
+            // this._oId = oEvent.getSource().getId();
         
             if (!oSelectedItem) {
                 sap.m.MessageToast.show("Por favor, selecione uma transação para editar.");
@@ -138,7 +144,11 @@ sap.ui.define([
         },
 
         calcularTotais: function () {
-            const aTransacoes = this.getView().getModel("transacoesModel").getData();
+            // const aTransacoes = this.getView().getModel("transacoesModel").getData();
+
+            const oTable = this.byId("trasactionTable");
+            const aItems = oTable.getBinding("items").getCurrentContexts();
+            const aTransacoes = aItems.map(ctx => ctx.getObject());
         
             const totalCredito = aTransacoes
                 .filter(t => t.tipo === "Crédito")
@@ -185,7 +195,7 @@ sap.ui.define([
             });
 
             transacoesModel.setData(listaAtualizada);
-            this.calcularTotais();        
+            // this.calcularTotais();        
             
         },        
         

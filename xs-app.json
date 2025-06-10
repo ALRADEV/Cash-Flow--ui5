@@ -1,0 +1,12 @@
+{
+  "welcomeFile": "/index.html",
+  "authenticationMethod": "none",
+  "routes": [
+    {
+      "source": "^/odata/v4/(.*)$",
+      "target": "/odata/v4/$1",
+      "destination": "TransacaoService",
+      "csrfProtection": false
+    }
+  ]
+}

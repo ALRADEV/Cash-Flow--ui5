@@ -57,7 +57,7 @@
                         updateFinished=".onUpdateFinished"
                         width="auto"
                         mode="MultiSelect"
-                        items="{path: 'transacoesModel>/'}">
+                        items="{path: '/Transacoes'}">
 
                         <headerToolbar>
                             <Toolbar>
@@ -122,32 +122,32 @@
                             <ColumnListItem
                                 highlight="{
                                     parts: [	
-                                        {path: 'transacoesModel>valor'},
-                                        {path: 'transacoesModel>tipo'}
+                                        {path: 'valor'},
+                                        {path: 'tipo'}
                                     ],
                                     formatter: '.formatter.quantityState'
                                 }">
 
                                 <cells>
                                     <Text text="{
-                                        path: 'transacoesModel>data',
-                                        formatter: '.formatter.formatDate'
-                                    }" />
+                                         path: 'data',
+                                         formatter: '.formatter.formatDate'}" 
+                                    />
 
-                                    <Text text="{transacoesModel>descricao}" />
+                                    <Text text="{descricao}" />
 
                                     <ObjectStatus
                                         text="{
                                             parts: [
-                                                {path: 'transacoesModel>valor'},
-                                                {path: 'transacoesModel>tipo'}
+                                                {path: 'valor'},
+                                                {path: 'tipo'}
                                             ],
                                             formatter: '.formatter.formatarValorComSinal'
                                         }"
                                         state="{
                                             parts: [
-                                                { path: 'transacoesModel>valor' },
-                                                { path: 'transacoesModel>tipo' }
+                                                { path: 'valor' },
+                                                { path: 'tipo' }
                                             ],
                                             formatter: '.formatter.quantityState'
                                         }"
@@ -155,11 +155,11 @@
                                         textAlign="End"/>
 
                                     <ObjectStatus
-                                        text="{transacoesModel>tipo}"
+                                        text="{tipo}"
                                         state="{
                                             parts: [	
-                                                {path: 'transacoesModel>valor'},
-                                                {path: 'transacoesModel>tipo'}
+                                                {path: 'valor'},
+                                                {path: 'tipo'}
                                             ],
                                             formatter: '.formatter.quantityState'
                                         }"/>

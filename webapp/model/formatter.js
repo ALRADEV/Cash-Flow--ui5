@@ -14,89 +14,55 @@ sap.ui.define([
         },
 
         formatarValorComSinal: function (valor, tipo) {
-            const numero = Number(valor);
+            const numero = parseFloat(valor);
+        
+            if (isNaN(numero)) {
+                return "-";
+            }
+        
             const prefixo = tipo === "Crédito" ? "+" : "-";
             return `${prefixo} ${numero.toFixed(2)}`;
         },
+        
+
+        // formatarValorComSinal: function (valor, tipo) {
+        //     const numero = Number(valor);
+        //     const prefixo = tipo === "Crédito" ? "+" : "-";
+        //     return `${prefixo} ${numero.toFixed(2)}`;
+        // },
+
+        // formatDate: function (sDate) {
+        //     const oDateFormatter = DateFormat.getInstance({
+        //         pattern: "dd/MM/yyyy"
+        //     });
+        //     return oDateFormatter.format(new Date(sDate));
+        // },
+
+        // formatDate: function (sDate) {
+        //     if (!sDate) return "";
+        
+        //     const parts = sDate.split("-");
+        //     const dateObj = new Date(parts[0], parts[1] - 1, parts[2]);
+        
+        //     return DateFormat.getInstance({ pattern: "dd/MM/yyyy" }).format(dateObj);
+        // }
 
         formatDate: function (sDate) {
-            const oDateFormatter = DateFormat.getInstance({
-                pattern: "dd/MM/yyyy"
-            });
-            return oDateFormatter.format(new Date(sDate));
-        },
+            if (!sDate) return "";
+        
+            // Garante o formato yyyy-mm-dd
+            const parts = sDate.split("-");
+            if (parts.length !== 3) return sDate;
+        
+            const year = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1; // mês começa do zero
+            const day = parseInt(parts[2], 10);
+        
+            const date = new Date(year, month, day);
+            return DateFormat.getInstance({ pattern: "dd/MM/yyyy" }).format(date);
+        }
+        
+        
         
     };
 });
-
-// sap.ui.define([
-// 	"sap/ui/core/library"
-// ] , function (coreLibrary) {
-// 	"use strict";
-
-// 	// shortcut for sap.ui.core.ValueState
-// 	var ValueState = coreLibrary.ValueState;
-
-// 	return {
-
-// 		/**
-// 		 * Rounds the number unit value to 2 digits
-// 		 * @public
-// 		 * @param {string} sValue the number string to be rounded
-// 		 * @returns {string} sValue with 2 digits rounded
-// 		 */
-// 		numberUnit : function (sValue) {
-// 			if (!sValue) {
-// 				return "";
-// 			}
-// 			return parseFloat(sValue).toFixed(2);
-// 		},
-
-// 		/**
-// 		 * Defines a value state based on the stock level
-// 		 *
-// 		 * @public
-// 		 * @param {number} iValue the stock level of a product
-// 		 * @returns {string} sValue the state for the stock level
-// 		 */
-// 		quantityState: function(iValue) {
-// 			if (iValue === 0) {
-// 				return ValueState.Error;
-// 			} else if (iValue <= 10) {
-// 				return ValueState.Warning;
-// 			} else {
-// 				return ValueState.Success;
-// 			}
-// 		}
-
-// 	};
-
-// });
-
-// sap.ui.define ( [ ] , função () {
-// 	"usar estrito" ;
-
-//    retornar {
-// 		  numberUnit : função ( sValue ) {
-// 		 // … 
-// 		 } ,
-// 		  /**
-// 		 * Define um estado de valor com base no preço
-// 		 *
-// 		 * @public 
-// 		 * @param { number } iPrice o preço de uma postagem
-// 		 * @returns { string } sValue o estado para o preço
-// 		 */ 
-// 		 priceState : function ( iPrice ) {
-// 			if ( iPrice < 50 ) {
-// 			   return  "Sucesso" ;
-// 		   } senão  se (iPreço >= 50 && iPreço < 250 ) {
-// 			   return  "Nenhum" ;
-// 		   } senão  se (iPreço >= 250 && iPreço < 2000 ) {
-// 			   return  "Aviso" ;
-// 		   } senão {
-// 			   return  "Erro" ;
-// 		   }
-// 	  }
-// };
-// });
