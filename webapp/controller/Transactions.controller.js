@@ -3,9 +3,11 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "cashflowapp/model/formatter",
     "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator"
+    "sap/ui/model/FilterOperator",
+    "sap/m/MessageToast",
+    "sap/m/MessageBox" 
 
-], (Controller, JSONModel, formatter, Filter, FilterOperator) => {
+], (Controller, JSONModel, formatter, Filter, FilterOperator, MessageToast, MessageBox) => {
     "use strict";
 
     return Controller.extend("cashflowapp.controller.Transactions", {
@@ -23,7 +25,7 @@ sap.ui.define([
                 serviceUrl: "/odata/v4/transacao/"
               });
             
-              this.getView().setModel(oModel, "transacoesModel");
+              this.getView().setModel(oModel);
 
             // this.calcularTotais();
         },
@@ -70,32 +72,24 @@ sap.ui.define([
             oBinding.filter(aFiltros);
         },
         
-        
-        
-        onEditButtonPress: function (oEvent) {
+        onEditButtonPress: function () {
             const oTable = this.byId("trasactionTable");
             const oSelectedItem = oTable.getSelectedItem();
-            // this._oId = oEvent.getSource().getId();
         
             if (!oSelectedItem) {
                 sap.m.MessageToast.show("Por favor, selecione uma transação para editar.");
                 return;
             }
         
-            const sPath = oSelectedItem.getBindingContext("transacoesModel").getPath();
-            const transacoesModel = this.getView().getModel("transacoesModel");
-            const selectedTransaction = transacoesModel.getProperty(sPath);
+            const oBindingContext = oSelectedItem.getBindingContext(); // modelo padrão
+            const selectedTransaction = oBindingContext.getObject(); // dados diretamente
         
             const transactionForm = {
-                id: selectedTransaction.id,
-                data: selectedTransaction.data,
-                descricao: selectedTransaction.descricao,
-                valor: selectedTransaction.valor,
-                tipo: selectedTransaction.tipo,
-                isEditing: true,
+                ...selectedTransaction,
+                isEditing: true
             };
         
-            const transactionFormModel = new JSONModel(transactionForm);
+            const transactionFormModel = new sap.ui.model.json.JSONModel(transactionForm);
             this.getView().setModel(transactionFormModel, "transactionForm");
         
             const viewId = this.getView().getId();
@@ -112,9 +106,50 @@ sap.ui.define([
             this.dialog.open();
         },
         
+        
+        
+        // onEditButtonPress: function (oEvent) {
+        //     const oTable = this.byId("trasactionTable");
+        //     const oSelectedItem = oTable.getSelectedItem();
+        //     // this._oId = oEvent.getSource().getId();
+        
+        //     if (!oSelectedItem) {
+        //         sap.m.MessageToast.show("Por favor, selecione uma transação para editar.");
+        //         return;
+        //     }
+        
+        //     const sPath = oSelectedItem.getBindingContext("transacoesModel").getPath();
+        //     const transacoesModel = this.getView().getModel("transacoesModel");
+        //     const selectedTransaction = transacoesModel.getProperty(sPath);
+        
+        //     const transactionForm = {
+        //         id: selectedTransaction.id,
+        //         data: selectedTransaction.data,
+        //         descricao: selectedTransaction.descricao,
+        //         valor: selectedTransaction.valor,
+        //         tipo: selectedTransaction.tipo,
+        //         isEditing: true,
+        //     };
+        
+        //     const transactionFormModel = new JSONModel(transactionForm);
+        //     this.getView().setModel(transactionFormModel, "transactionForm");
+        
+        //     const viewId = this.getView().getId();
+        
+        //     if (!this.dialog) {
+        //         this.dialog = sap.ui.xmlfragment(
+        //             viewId,
+        //             "cashflowapp.view.fragment.TransactionDialog",
+        //             this
+        //         );
+        //         this.getView().addDependent(this.dialog);
+        //     }
+        
+        //     this.dialog.open();
+        // },
+
         onCreateButtonPress: function (oEvent) {
             const viewId = this.getView().getId();
-            this._oId = oEvent.getSource().getId();
         
             if (!this.dialog) {
                 this.dialog = sap.ui.xmlfragment(
@@ -126,18 +161,46 @@ sap.ui.define([
             }
         
             const transactionForm = {
-                id: Date.now(), 
                 data: "",
                 descricao: "",
                 valor: "",
                 tipo: "Crédito",
                 isEditing: false,
             };
-            const transactionFormModel = new JSONModel(transactionForm);
+            
+            const transactionFormModel = new sap.ui.model.json.JSONModel(transactionForm);
             this.getView().setModel(transactionFormModel, "transactionForm");
         
             this.dialog.open();
         },
+        
+        
+        // onCreateButtonPress: function (oEvent) {
+        //     const viewId = this.getView().getId();
+        //     this._oId = oEvent.getSource().getId();
+        
+        //     if (!this.dialog) {
+        //         this.dialog = sap.ui.xmlfragment(
+        //             viewId,
+        //             "cashflowapp.view.fragment.TransactionDialog",
+        //             this
+        //         );
+        //         this.getView().addDependent(this.dialog);
+        //     }
+        
+        //     const transactionForm = {
+        //         id: Date.now(), 
+        //         data: "",
+        //         descricao: "",
+        //         valor: "",
+        //         tipo: "Crédito",
+        //         isEditing: false,
+        //     };
+        //     const transactionFormModel = new JSONModel(transactionForm);
+        //     this.getView().setModel(transactionFormModel, "transactionForm");
+        
+        //     this.dialog.open();
+        // },
         
         onCloseDialog: function () {
             this.dialog.close();
@@ -171,10 +234,9 @@ sap.ui.define([
                 saldoTotal: `${saldo >= 0 ? '+' : '-'} ${Math.abs(saldo).toFixed(2)}`
             });
         },
-        
+
         onDeleteSelectedRows: function () {
             const oTable = this.byId("trasactionTable");
-            const transacoesModel = oTable.getBinding("items").getModel();
             const oSelectedItem = oTable.getSelectedItem();
         
             if (!oSelectedItem) {
@@ -182,53 +244,147 @@ sap.ui.define([
                 return;
             }
         
-            const sSelectedPath = oSelectedItem.getBindingContextPath();
-            const transacoes = transacoesModel.getData();
-        
-            const transacaoParaRemover = transacoesModel.getProperty(sSelectedPath);
-        
-            const listaAtualizada = transacoes.filter(t => {
-                return !(t.data === transacaoParaRemover.data &&
-                         t.descricao === transacaoParaRemover.descricao &&
-                         t.valor == transacaoParaRemover.valor &&
-                         t.tipo === transacaoParaRemover.tipo);
-            });
-
-            transacoesModel.setData(listaAtualizada);
-            // this.calcularTotais();        
-            
-        },        
-        
-        onSaveTransaction: function () {
-            const transacoesModel = this.getView().getModel("transacoesModel");
-            const transacoes = transacoesModel.getData();
-        
-            const formModel = this.getView().getModel("transactionForm");
-            const formData = formModel.getData();
-        
-            if (!formData.descricao || !formData.data || !formData.valor || !formData.tipo) {
-                sap.m.MessageToast.show("Preencha todos os campos obrigatórios.");
+            const oBindingContext = oSelectedItem.getBindingContext(); // usa o modelo padrão
+            if (!oBindingContext) {
+                sap.m.MessageBox.error("Erro interno: não foi possível obter o contexto da transação.");
                 return;
             }
         
-            if (formData.isEditing && formData.id !== undefined) {
-                const index = transacoes.findIndex(t => t.id === formData.id);
-                if (index !== -1) {
-                    transacoes.splice(index, 1, formData);
-                }
-            } else {
-                formData.id = Date.now(); // Gera ID para novas transações
-                transacoes.push(formData);
-            }
-        
-            transacoesModel.setProperty("/", transacoes);
-        
-            this.calcularTotais();
-            this.dialog.close();
+            oBindingContext.delete().then(() => {
+                sap.m.MessageToast.show("Transação excluída com sucesso.");
+                
+            });
         },
         
-                 
         
+        
+
+        // onDeleteSelectedRows: function () {
+        //     var oModel = this.getView().getModel();
+        //     var sPath = "/Transacoes";
+          
+        //     oModel.remove(sPath, {
+        //       success: function () {
+        //         MessageToast.show("Removido com sucesso!");
+        //       },
+        //       error: function () {
+        //         MessageBox.error("Erro ao remover.");
+        //       }
+        //     });
+        // },
+        
+        // onDeleteSelectedRows: function () {
+        //     const oTable = this.byId("trasactionTable");
+        //     const transacoesModel = oTable.getBinding("items").getModel();
+        //     const oSelectedItem = oTable.getSelectedItem();
+        
+        //     if (!oSelectedItem) {
+        //         sap.m.MessageToast.show("Por favor, selecione uma transação para excluir.");
+        //         return;
+        //     }
+        
+        //     const sSelectedPath = oSelectedItem.getBindingContextPath();
+        //     const transacoes = transacoesModel.getData();
+        
+        //     const transacaoParaRemover = transacoesModel.getProperty(sSelectedPath);
+        
+        //     const listaAtualizada = transacoes.filter(t => {
+        //         return !(t.data === transacaoParaRemover.data &&
+        //                  t.descricao === transacaoParaRemover.descricao &&
+        //                  t.valor == transacaoParaRemover.valor &&
+        //                  t.tipo === transacaoParaRemover.tipo);
+        //     });
+
+        //     transacoesModel.setData(listaAtualizada);
+        //     // this.calcularTotais();        
+            
+        // },
+        
+        
+        onSaveTransaction: async function () {
+            const oView = this.getView();
+            const oModel = oView.getModel(); // Modelo OData V4
+            const oDialog = this.dialog;
+            const oTable = this.byId("trasactionTable");
+            const oFormData = oView.getModel("transactionForm").getData();
+        
+            // Validação simples
+            if (!oFormData.descricao || !oFormData.data || !oFormData.valor || !oFormData.tipo) {
+                MessageBox.warning("Preencha todos os campos obrigatórios.");
+                return;
+            }
+        
+            const oFormattedData = {
+                descricao: oFormData.descricao,
+                data: oFormData.data,
+                valor: parseFloat(oFormData.valor),
+                tipo: oFormData.tipo
+            };
+        
+            try {
+                if (oFormData.isEditing) {
+                    // EDIÇÃO (funcional com setProperty + submitBatch)
+                    const oSelectedItem = oTable.getSelectedItem();
+        
+                    if (!oSelectedItem) {
+                        MessageBox.warning("Nenhuma transação selecionada para edição.");
+                        return;
+                    }
+        
+                    const oBindingContext = oSelectedItem.getBindingContext();
+        
+                    oBindingContext.setProperty("data", oFormData.data);
+                    oBindingContext.setProperty("descricao", oFormData.descricao);
+                    oBindingContext.setProperty("valor", parseFloat(oFormData.valor));
+                    oBindingContext.setProperty("tipo", oFormData.tipo);
+        
+                  
+                    MessageToast.show("Transação atualizada com sucesso.");
+                } else {
+                    // CRIAÇÃO (com bindList().create())
+                    const oListBinding = oModel.bindList("/Transacoes");
+                    await oListBinding.create(oFormattedData);
+                    MessageToast.show("Transação criada com sucesso!");
+                }
+        
+                oDialog.close();
+                oModel.refresh(); // Atualiza a tabela após salvar
+        
+            } catch (err) {
+                console.error("Erro ao salvar transação:", err);
+                MessageBox.error("Erro ao salvar a transação.");
+            }
+        },        
+                                     
+        // onSaveTransaction: function () {
+        //     const transacoesModel = this.getView().getModel("transacoesModel");
+        //     const transacoes = transacoesModel.getData();
+        
+        //     const formModel = this.getView().getModel("transactionForm");
+        //     const formData = formModel.getData();
+        
+        //     if (!formData.descricao || !formData.data || !formData.valor || !formData.tipo) {
+        //         sap.m.MessageToast.show("Preencha todos os campos obrigatórios.");
+        //         return;
+        //     }
+        
+        //     if (formData.isEditing && formData.id !== undefined) {
+        //         const index = transacoes.findIndex(t => t.id === formData.id);
+        //         if (index !== -1) {
+        //             transacoes.splice(index, 1, formData);
+        //         }
+        //     } else {
+        //         formData.id = Date.now(); // Gera ID para novas transações
+        //         transacoes.push(formData);
+        //     }
+        
+        //     transacoesModel.setProperty("/", transacoes);
+        
+        //     this.calcularTotais();
+        //     this.dialog.close();
+        // },
+        
+    
         
         onCloseTransaction: function () {
             this.dialog.close();
