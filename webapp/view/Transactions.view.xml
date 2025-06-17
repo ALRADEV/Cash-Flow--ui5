@@ -49,7 +49,7 @@
                 expandable="false">
                 <content>
                     <Table
-                        id="trasactionTable"
+                        id="transactionTable"
                         busyIndicatorDelay="{worklistView>/tableBusyDelay}"
                         growing="true"
                         growingScrollToLoad="true"
@@ -57,7 +57,12 @@
                         updateFinished=".onUpdateFinished"
                         width="auto"
                         mode="MultiSelect"
-                        items="{path: '/Transacoes'}">
+                        items="{
+                            path: '/Transacoes',
+                            parameters: {
+                                $select: 'descricao,data,tipo,valor'
+                            }                                                  
+                        }">
 
                         <headerToolbar>
                             <Toolbar>

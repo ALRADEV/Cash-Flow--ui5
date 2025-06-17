@@ -56,16 +56,15 @@
     },
     "models": {
       "": {
+        "type": "sap.ui.model.odata.v4.ODataModel",
         "dataSource": "mainService",
         "settings": {
           "synchronizationMode": "None",
           "operationMode": "Server",
           "autoExpandSelect": true,
           "earlyRequests": true,
-          "groupId": "$auto",   
-          "serviceUrl": "/odata/v4/"
-      },
-      "type": "sap.ui.model.odata.v4.ODataModel"
+          "groupId": "$auto"          
+      }      
      },
       "i18n": {
         "type": "sap.ui.model.resource.ResourceModel",
