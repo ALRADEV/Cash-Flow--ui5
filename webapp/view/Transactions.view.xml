@@ -58,10 +58,7 @@
                         width="auto"
                         mode="MultiSelect"
                         items="{
-                            path: '/Transacoes',
-                            parameters: {
-                                $select: 'descricao,data,tipo,valor'
-                            }                                                  
+                            path: '/Transacoes'
                         }">
 
                         <headerToolbar>
@@ -80,8 +77,8 @@
 
                                 <SearchField
                                     id="searchField"
-                                    placeholder="{i18n>worklistSearchTooltip}"
-                                    search=".onSearch"
+                                    placeholder="{i18n>worklistSearchTooltip}"                                    
+                                    search="transactionSearch"
                                     width="25rem"
                                     class="sapUiTinyMarginEnd"/>
 

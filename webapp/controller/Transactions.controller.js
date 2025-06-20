@@ -2,13 +2,13 @@ sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
     "cashflowapp/model/formatter",
-    // "sap/ui/model/odata/v4/Filter",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/m/MessageToast",
-    "sap/m/MessageBox" 
+    "sap/m/MessageBox",
+    "sap/ui/model/odata/OperationMode"
 
-], (Controller, JSONModel, formatter, Filter, FilterOperator, MessageToast, MessageBox) => {
+], (Controller, JSONModel, formatter, Filter, FilterOperator, MessageToast, MessageBox, OperationMode) => {
     "use strict";
 
     return Controller.extend("cashflowapp.controller.Transactions", {
@@ -16,22 +16,14 @@ sap.ui.define([
         formatter: formatter,
 
         onInit() {
-
-            // const oModel = new JSONModel();
-            // oModel.loadData("./localService/mockdata/Transactions.json", null, false);
-
-            // this.getView().setModel(oModel, "transacoesModel");
-
             const oModel = new sap.ui.model.odata.v4.ODataModel({
                 serviceUrl: "/odata/v4/transacao/"
-              });
+            });
             
-              this.getView().setModel(oModel);
-
-            // this.calcularTotais();
+            this.getView().setModel(oModel);
         },
-            
-        onSearch: function (oEvent) {
+
+        transactionSearch: function (oEvent) {
             const sQuery = oEvent.getParameter("query");
             const oTable = this.byId("transactionTable");
         
@@ -40,42 +32,105 @@ sap.ui.define([
                 return;
             }
         
-            const oBinding = oTable.getBinding("items");
-            if (!oBinding) {
-                console.warn("Binding da tabela não encontrado");
-                return;
+            // Quando há pesquisa: aplica o filtro
+            if (sQuery && sQuery.trim() !== "") {
+                const sSafeQuery = sQuery.replace(/'/g, "''");
+        
+                const oBinding = oTable.getBinding("items");
+                if (oBinding) {
+                    oBinding.changeParameters({
+                        $filter: `contains(descricao,'${sSafeQuery}')`
+                    });
+                    oBinding.refresh();
+                }
+            } else {
+                // Quando o campo estiver vazio, "rebinda" a tabela do zero sem filtros
+                oTable.bindItems({
+                    path: "/Transacoes",
+                    parameters: {
+                        $select: "descricao,data,tipo,valor"
+                    },
+                    template: oTable.getBindingInfo("items").template
+                });
             }
+        },
         
-            const aFilters = [];
         
-            if (sQuery) {
-                aFilters.push(new sap.ui.model.Filter("descricao", sap.ui.model.FilterOperator.Contains, sQuery));
-            }
+            
+        // onSearch: function (oEvent) {
+        //     const sQuery = oEvent.getParameter("query");
+        //     const oTable = this.byId("transactionTable");
         
-            // Aplica os filtros — no OData V4 NÃO se passa "Application" aqui
-            oBinding.filter(aFilters);
-        },      
+        //     if (!oTable) {
+        //         console.warn("Tabela não encontrada");
+        //         return;
+        //     }
+        
+        //     const oBinding = oTable.getBinding("items");
+        //     if (!oBinding) {
+        //         console.warn("Binding da tabela não encontrado");
+        //         return;
+        //     }
+
+        //     const oParameters = {
+        //         $select: 'descricao,data,tipo,valor'
+        //     };
+
+        //     if (sQuery && sQuery.trim() !== "") {
+        //         oParameters.$filter = `contains(descricao,'${sQuery}')`;
+        //     }
+
+        //     oBinding.changeParameters(oParameters);
+        //     oBinding.refresh();
+        // },     
         
 
+        // onFiltrarMesAno: function (oEvent) {
+        //     const sValor = oEvent.getSource().getValue(); // yyyy-MM
+        //     const aFiltros = [];
+        
+        //     if (sValor) {
+        //         const [sAno, sMes] = sValor.split("-");
+        //         const dataInicial = new Date(sAno, sMes - 1, 1);
+        //         const dataFinal = new Date(sAno, sMes, 0); // último dia do mês
+        
+        //         const oFilterDataInicial = new Filter("data", FilterOperator.GE, dataInicial.toISOString());
+        //         const oFilterDataFinal = new Filter("data", FilterOperator.LE, dataFinal.toISOString());
+        
+        //         aFiltros.push(oFilterDataInicial, oFilterDataFinal);
+        //     }
+        
+        //     const oTable = this.byId("transactionTable");
+        //     const oBinding = oTable.getBinding("items");
+        //     oBinding.filter(aFiltros);
+        // },
+        
         onFiltrarMesAno: function (oEvent) {
             const sValor = oEvent.getSource().getValue(); // yyyy-MM
             const aFiltros = [];
         
             if (sValor) {
                 const [sAno, sMes] = sValor.split("-");
-                const dataInicial = new Date(sAno, sMes - 1, 1);
-                const dataFinal = new Date(sAno, sMes, 0); // último dia do mês
         
-                const oFilterDataInicial = new Filter("data", FilterOperator.GE, dataInicial.toISOString());
-                const oFilterDataFinal = new Filter("data", FilterOperator.LE, dataFinal.toISOString());
+                // Formata para yyyy-MM-dd
+                const dataInicial = `${sAno}-${sMes}-01`;
+                const ultimoDia = new Date(sAno, sMes, 0).getDate(); // último dia do mês
+                const dataFinal = `${sAno}-${sMes}-${ultimoDia.toString().padStart(2, "0")}`;
+        
+                const oFilterDataInicial = new sap.ui.model.Filter("data", sap.ui.model.FilterOperator.GE, dataInicial);
+                const oFilterDataFinal = new sap.ui.model.Filter("data", sap.ui.model.FilterOperator.LE, dataFinal);
         
                 aFiltros.push(oFilterDataInicial, oFilterDataFinal);
             }
         
             const oTable = this.byId("transactionTable");
             const oBinding = oTable.getBinding("items");
-            oBinding.filter(aFiltros);
-        },   
+        
+            if (oBinding) {
+                oBinding.filter(aFiltros);
+            }
+        },
+        
         
         onEditButtonPress: function () {
             const oTable = this.byId("transactionTable");
