@@ -107,29 +107,37 @@ sap.ui.define([
         
         onFiltrarMesAno: function (oEvent) {
             const sValor = oEvent.getSource().getValue(); // yyyy-MM
-            const aFiltros = [];
+            const oTable = this.byId("transactionTable");
         
+            if (!oTable) return;
+        
+            const oBinding = oTable.getBinding("items");
+            if (!oBinding) return;
+        
+            // Se valor preenchido, cria o filtro de data
             if (sValor) {
                 const [sAno, sMes] = sValor.split("-");
         
-                // Formata para yyyy-MM-dd
                 const dataInicial = `${sAno}-${sMes}-01`;
-                const ultimoDia = new Date(sAno, sMes, 0).getDate(); // último dia do mês
-                const dataFinal = `${sAno}-${sMes}-${ultimoDia.toString().padStart(2, "0")}`;
+                const ultimoDia = new Date(sAno, sMes, 0).getDate();
+                const dataFinal = `${sAno}-${sMes}-${String(ultimoDia).padStart(2, "0")}`;
         
-                const oFilterDataInicial = new sap.ui.model.Filter("data", sap.ui.model.FilterOperator.GE, dataInicial);
-                const oFilterDataFinal = new sap.ui.model.Filter("data", sap.ui.model.FilterOperator.LE, dataFinal);
+                const sFilter = `data ge ${dataInicial} and data le ${dataFinal}`;
         
-                aFiltros.push(oFilterDataInicial, oFilterDataFinal);
-            }
-        
-            const oTable = this.byId("transactionTable");
-            const oBinding = oTable.getBinding("items");
-        
-            if (oBinding) {
-                oBinding.filter(aFiltros);
+                oBinding.changeParameters({
+                    $filter: sFilter
+                });
+                oBinding.refresh();
+            } else {
+                // Limpa os filtros de data se o campo for apagado
+                oBinding.changeParameters({
+                    $filter: undefined
+                });
+                oBinding.refresh();
             }
         },
+                    
+        
         
         
         onEditButtonPress: function () {
@@ -194,7 +202,7 @@ sap.ui.define([
         
         onCloseDialog: function () {
             this.dialog.close();
-        },
+        },               
 
         calcularTotais: function () {
             // const aTransacoes = this.getView().getModel("transacoesModel").getData();
@@ -304,6 +312,10 @@ sap.ui.define([
         onCloseTransaction: function () {
             this.dialog.close();
         },
+
+        onUpdateFinished: function () {
+            this.calcularTotais();
+        }
         
     
     });
