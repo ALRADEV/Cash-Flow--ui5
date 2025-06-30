@@ -58,7 +58,7 @@
                         width="auto"
                         mode="MultiSelect"
                         items="{
-                            path: '/Transacoes'
+                            path: '/Transacoes'                            
                         }">
 
                         <headerToolbar>
@@ -141,7 +141,13 @@
                                     <ObjectStatus
                                         text="{
                                             parts: [
-                                                {path: 'valor'},
+                                                {path: 'valor', 
+                                                 type: 'sap.ui.model.type.Float', 
+                                                 formatOptions: { 
+                                                    groupingEnabled: false,
+                                                    minFractionDigits: 2,
+                                                    maxFractionDigits: 2
+                                                 }},
                                                 {path: 'tipo'}
                                             ],
                                             formatter: '.formatter.formatarValorComSinal'

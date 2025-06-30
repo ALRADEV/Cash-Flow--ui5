@@ -14,15 +14,23 @@ sap.ui.define([
         },
 
         formatarValorComSinal: function (valor, tipo) {
-            const numero = parseFloat(valor);
-        
-            if (isNaN(numero)) {
-                return "-";
-            }
-        
-            const prefixo = tipo === "Crédito" ? "+" : "-";
-            return `${prefixo} ${numero.toFixed(2)}`;
+            if (valor == null) return "";
+            const sinal = tipo === "Débito" ? "-" : "+";
+            // força duas casas decimais E vírgula
+            const valorFormatado = Number(valor).toFixed(2).replace(".", ",");
+            return `${sinal} ${valorFormatado}`;
         },
+
+        // formatarValorComSinal: function (valor, tipo) {
+        //     const numero = parseFloat(valor);
+        
+        //     if (isNaN(numero)) {
+        //         return "-";
+        //     }
+        
+        //     const prefixo = tipo === "Crédito" ? "+" : "-";
+        //     return `${prefixo} ${numero.toFixed(2)}`;
+        // },
         
 
         // formatarValorComSinal: function (valor, tipo) {
